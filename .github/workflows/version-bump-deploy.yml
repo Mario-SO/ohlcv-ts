@@ -100,6 +100,17 @@ jobs:
           fi
         continue-on-error: true
 
+      - name: Commit version bump
+        run: |
+          git add deno.json
+          git commit -m "chore: bump version to v${{ steps.version.outputs.new_version }} (${{ steps.version.outputs.bump_type }})"
+
+      - name: Create and push tag
+        run: |
+          git tag -a "v${{ steps.version.outputs.new_version }}" -m "Release v${{ steps.version.outputs.new_version }}"
+          git push origin main
+          git push origin "v${{ steps.version.outputs.new_version }}"
+
       - name: Validate package configuration
         run: |
           echo "Validating deno.json configuration for JSR..."
@@ -117,17 +128,6 @@ jobs:
         run: |
           echo "Publishing to JSR registry..."
           deno publish
-
-      - name: Commit version bump
-        run: |
-          git add deno.json
-          git commit -m "chore: bump version to v${{ steps.version.outputs.new_version }} (${{ steps.version.outputs.bump_type }})"
-
-      - name: Create and push tag
-        run: |
-          git tag -a "v${{ steps.version.outputs.new_version }}" -m "Release v${{ steps.version.outputs.new_version }}"
-          git push origin main
-          git push origin "v${{ steps.version.outputs.new_version }}"
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
