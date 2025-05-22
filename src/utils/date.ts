@@ -6,23 +6,23 @@ import {
 
 /**
  * Parses a date string in `YYYY-MM-DD` format (UTC) to seconds since Unix epoch.
- * 
+ *
  * Converts a date string in ISO date format to a Unix timestamp (seconds since
  * January 1, 1970, 00:00:00 UTC). The input date is treated as UTC midnight.
- * 
+ *
  * @param dateStr - Date string in YYYY-MM-DD format (e.g., "2023-01-01")
  * @returns Unix timestamp in seconds (not milliseconds)
- * 
+ *
  * @throws {InvalidDateFormatError} When the date string format is invalid
  * @throws {DateBeforeEpochError} When the date is before 1970-01-01
- * 
+ *
  * @example
  * ```typescript
  * import { yyyymmddToUnix } from "@mso/ohlcv/utils";
- * 
+ *
  * const timestamp = yyyymmddToUnix("2023-01-01");
  * console.log(timestamp); // 1672531200
- * 
+ *
  * const date = new Date(timestamp * 1000);
  * console.log(date.toISOString()); // "2023-01-01T00:00:00.000Z"
  * ```

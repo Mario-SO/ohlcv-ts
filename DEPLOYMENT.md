@@ -1,10 +1,12 @@
 # Version Management and JSR Publishing
 
-This library uses automated GitHub Actions for semantic versioning and JSR package publishing.
+This library uses automated GitHub Actions for semantic versioning and JSR
+package publishing.
 
 ## 🎯 **Workflow Overview**
 
-Since this is a **TypeScript library** (not a deployed application), the workflow is focused on:
+Since this is a **TypeScript library** (not a deployed application), the
+workflow is focused on:
 
 1. **Version Management**: Semantic versioning with git tags
 2. **JSR Publishing**: Package distribution via `deno publish`
@@ -14,7 +16,8 @@ Since this is a **TypeScript library** (not a deployed application), the workflo
 
 ### Usage
 
-To trigger an automated version bump and JSR publishing, include one of these commands in your commit message:
+To trigger an automated version bump and JSR publishing, include one of these
+commands in your commit message:
 
 ```bash
 # Patch version bump (0.0.1 → 0.0.2) - Bug fixes
@@ -79,11 +82,13 @@ Ensure your `deno.json` has the correct configuration:
 ## 🔍 **Monitoring**
 
 ### JSR Package
+
 - **Package Page**: https://jsr.io/@mso/ohlcv
 - **Installation**: `deno add jsr:@mso/ohlcv`
 - **Documentation**: Auto-generated from TypeScript
 
 ### GitHub
+
 - **Actions Tab**: View workflow runs and logs
 - **Releases**: Version history and changelogs
 - **Tags**: All version tags
@@ -91,12 +96,14 @@ Ensure your `deno.json` has the correct configuration:
 ## 🚨 **Manual Operations**
 
 ### Manual JSR Publishing
+
 ```bash
 # Publish current version to JSR
 deno publish
 ```
 
 ### Manual Version Bump
+
 ```bash
 # Update deno.json manually and create release
 git add deno.json
@@ -106,6 +113,7 @@ git push origin main --tags
 ```
 
 ### Check Package Status
+
 ```bash
 # Validate package configuration
 deno publish --dry-run
@@ -117,17 +125,21 @@ deno eval "console.log(JSON.parse(Deno.readTextFileSync('deno.json')).version)"
 ## 🐛 **Troubleshooting**
 
 ### Version Bump Issues
-1. **No bump detected**: Ensure commit message contains exactly `bump(patch)`, `bump(minor)`, or `bump(major)`
+
+1. **No bump detected**: Ensure commit message contains exactly `bump(patch)`,
+   `bump(minor)`, or `bump(major)`
 2. **Tests fail**: Fix failing tests before version bump will complete
 3. **Git permission denied**: Check workflow has `contents: write` permission
 
 ### JSR Publishing Issues
+
 1. **Package validation fails**: Check `deno.json` exports configuration
 2. **Version already exists**: JSR doesn't allow republishing the same version
 3. **Authentication fails**: Check repository OIDC permissions
 4. **Module resolution fails**: Ensure all exported modules exist and are valid
 
 ### Common Fixes
+
 ```bash
 # Check for syntax errors in your modules
 deno check mod.ts
@@ -145,7 +157,8 @@ deno eval "import * as lib from './mod.ts'; console.log(Object.keys(lib))"
   - Example: `0.1.2 → 0.1.3`
 - **`bump(minor)`**: New features, additions to API, backward compatible
   - Example: `0.1.3 → 0.2.0`
-- **`bump(major)`**: Breaking changes, major refactoring, incompatible API changes
+- **`bump(major)`**: Breaking changes, major refactoring, incompatible API
+  changes
   - Example: `0.2.0 → 1.0.0`
 
 ## 🎯 **Best Practices**
@@ -158,4 +171,5 @@ deno eval "import * as lib from './mod.ts'; console.log(Object.keys(lib))"
 
 ---
 
-**Simple workflow**: Just add `bump(patch/minor/major)` to your commit message and everything else is automated! 🚀 
+**Simple workflow**: Just add `bump(patch/minor/major)` to your commit message
+and everything else is automated! 🚀

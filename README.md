@@ -1,16 +1,23 @@
 # @mso/ohlcv
 
-A high-performance TypeScript library for fetching and parsing OHLCV (Open, High, Low, Close, Volume) financial data in Deno. This library provides multiple parsing strategies optimized for different use cases, from simple CSV parsing to streaming high-performance parsers.
+A high-performance TypeScript library for fetching and parsing OHLCV (Open,
+High, Low, Close, Volume) financial data in Deno. This library provides multiple
+parsing strategies optimized for different use cases, from simple CSV parsing to
+streaming high-performance parsers.
 
 ## 🚀 Features
 
-- **Multiple Parsing Strategies**: Choose from 4 different parsers based on your performance needs
+- **Multiple Parsing Strategies**: Choose from 4 different parsers based on your
+  performance needs
 - **Streaming Support**: Memory-efficient streaming parsers for large datasets
-- **Built-in Data Sources**: Pre-configured endpoints for BTC, ETH, SP500, and Gold data
-- **Comprehensive Error Handling**: Detailed error types for robust error handling
+- **Built-in Data Sources**: Pre-configured endpoints for BTC, ETH, SP500, and
+  Gold data
+- **Comprehensive Error Handling**: Detailed error types for robust error
+  handling
 - **Zero Dependencies**: Pure TypeScript implementation for Deno
 - **Type Safety**: Full TypeScript support with strict typing
-- **Performance Optimized**: Benchmarked parsers with different optimization strategies
+- **Performance Optimized**: Benchmarked parsers with different optimization
+  strategies
 
 ## 📦 Installation
 
@@ -35,11 +42,7 @@ import * as ohlcv from "jsr:@mso/ohlcv";
 ### Import specific functions
 
 ```typescript
-import { 
-  DataSource, 
-  fetchCsvAsText, 
-  parseWithSimpleSplit 
-} from "@mso/ohlcv";
+import { DataSource, fetchCsvAsText, parseWithSimpleSplit } from "@mso/ohlcv";
 ```
 
 ### Import specific modules
@@ -53,11 +56,7 @@ import type { Row } from "@mso/ohlcv/types";
 ## 🏃 Quick Start
 
 ```typescript
-import { 
-  DataSource, 
-  fetchCsvAsText, 
-  parseWithSimpleSplit 
-} from "@mso/ohlcv";
+import { DataSource, fetchCsvAsText, parseWithSimpleSplit } from "@mso/ohlcv";
 
 // Fetch and parse Bitcoin data
 const csvData = await fetchCsvAsText(DataSource.BTC_CSV);
@@ -74,12 +73,12 @@ The library works with a standardized `Row` interface:
 
 ```typescript
 interface Row {
-  ts: number;  // Unix timestamp (seconds since epoch)
-  o: number;   // Open price
-  h: number;   // High price
-  l: number;   // Low price
-  c: number;   // Close price
-  v: number;   // Volume
+  ts: number; // Unix timestamp (seconds since epoch)
+  o: number; // Open price
+  h: number; // High price
+  l: number; // Low price
+  c: number; // Close price
+  v: number; // Volume
 }
 ```
 
@@ -89,10 +88,14 @@ Pre-configured data sources are available:
 
 ```typescript
 enum DataSource {
-  BTC_CSV = "https://raw.githubusercontent.com/Mario-SO/ohlcv/main/data/btc.csv",
-  SP500_CSV = "https://raw.githubusercontent.com/Mario-SO/ohlcv/main/data/sp500.csv",
-  ETH_CSV = "https://raw.githubusercontent.com/Mario-SO/ohlcv/main/data/eth.csv",
-  GOLD_CSV = "https://raw.githubusercontent.com/Mario-SO/ohlcv/main/data/gold.csv"
+  BTC_CSV =
+    "https://raw.githubusercontent.com/Mario-SO/ohlcv/main/data/btc.csv",
+  SP500_CSV =
+    "https://raw.githubusercontent.com/Mario-SO/ohlcv/main/data/sp500.csv",
+  ETH_CSV =
+    "https://raw.githubusercontent.com/Mario-SO/ohlcv/main/data/eth.csv",
+  GOLD_CSV =
+    "https://raw.githubusercontent.com/Mario-SO/ohlcv/main/data/gold.csv",
 }
 ```
 
@@ -127,10 +130,7 @@ const rows = parseFullStringWithStateMachine(csvData, onSkipError);
 Best for: Large datasets, memory efficiency
 
 ```typescript
-import { 
-  fetchCsvAsStream, 
-  parseStreamWithStateMachine 
-} from "@mso/ohlcv";
+import { fetchCsvAsStream, parseStreamWithStateMachine } from "@mso/ohlcv";
 
 const stream = await fetchCsvAsStream(DataSource.BTC_CSV);
 let processedRows = 0;
@@ -144,7 +144,7 @@ const totalRows = await parseStreamWithStateMachine(
   },
   (error, lineNumber, lineContent) => {
     console.warn(`Error on line ${lineNumber}: ${error.message}`);
-  }
+  },
 );
 
 console.log(`Processed ${processedRows} of ${totalRows} total rows`);
@@ -155,10 +155,7 @@ console.log(`Processed ${processedRows} of ${totalRows} total rows`);
 Best for: Maximum performance with large datasets
 
 ```typescript
-import { 
-  fetchCsvAsStream, 
-  parseStreamOptimizedOhlcv 
-} from "@mso/ohlcv";
+import { fetchCsvAsStream, parseStreamOptimizedOhlcv } from "@mso/ohlcv";
 
 const stream = await fetchCsvAsStream(DataSource.SP500_CSV);
 const rows: Row[] = [];
@@ -171,7 +168,7 @@ const totalRows = await parseStreamOptimizedOhlcv(
   true, // skipHeader
   (error, lineNumber, lineContent) => {
     console.warn(`Skipped line ${lineNumber}: ${error.message}`);
-  }
+  },
 );
 ```
 
@@ -190,12 +187,12 @@ const timestamp = yyyymmddToUnix("2023-01-01"); // Returns Unix timestamp
 The library provides comprehensive error types:
 
 ```typescript
-import { 
-  ParseError, 
-  InvalidFormatError, 
-  InvalidTimestampError,
+import {
   FetchError,
-  HttpError 
+  HttpError,
+  InvalidFormatError,
+  InvalidTimestampError,
+  ParseError,
 } from "@mso/ohlcv/errors";
 
 try {
@@ -222,7 +219,8 @@ deno bench --allow-net bench.ts
 
 ### Benchmark Results
 
-Here are the performance results from running the benchmarks on a typical system:
+Here are the performance results from running the benchmarks on a typical
+system:
 
 ```
 benchmark                               time/iter (avg)        iter/s      (min … max)           p75      p99     p995
@@ -264,13 +262,17 @@ memory-stress-test                             118.6 ms           8.4 (116.9 ms 
 
 ### Performance Insights
 
-- **🏆 parseStreamOptimizedOhlcv** is the fastest parser at **7.4ms** (135.1 iter/s)
+- **🏆 parseStreamOptimizedOhlcv** is the fastest parser at **7.4ms** (135.1
+  iter/s)
 - **State machine parsers** outperform simple split by ~30-40%
-- **Dataset size** has linear impact on performance (59x difference between small and large)
+- **Dataset size** has linear impact on performance (59x difference between
+  small and large)
 - **Network fetch** performance is similar for text vs stream (~1ms difference)
-- **End-to-end** stream optimization provides minimal gains over simple parsing for network-bound operations
+- **End-to-end** stream optimization provides minimal gains over simple parsing
+  for network-bound operations
 
 The library includes comprehensive benchmarks testing:
+
 - Different parsing strategies
 - Various dataset sizes
 - Network fetch performance
@@ -282,10 +284,7 @@ The library includes comprehensive benchmarks testing:
 ### Real-time Data Processing
 
 ```typescript
-import { 
-  fetchCsvAsStream, 
-  parseStreamOptimizedOhlcv 
-} from "@mso/ohlcv";
+import { fetchCsvAsStream, parseStreamOptimizedOhlcv } from "@mso/ohlcv";
 
 // Process data as it streams in
 const stream = await fetchCsvAsStream(DataSource.BTC_CSV);
@@ -295,13 +294,13 @@ await parseStreamOptimizedOhlcv(
   stream,
   (row: Row) => {
     latestPrice = row.c; // Update latest close price
-    
+
     // Real-time processing logic here
     if (row.c > row.o) {
       console.log(`Price up: ${row.c} at ${new Date(row.ts * 1000)}`);
     }
   },
-  true
+  true,
 );
 ```
 
@@ -330,7 +329,11 @@ console.log(`20-day moving average: ${ma20[ma20.length - 1]}`);
 ```typescript
 import { DataSource, fetchCsvAsText, parseWithSimpleSplit } from "@mso/ohlcv";
 
-const dataSources = [DataSource.BTC_CSV, DataSource.ETH_CSV, DataSource.SP500_CSV];
+const dataSources = [
+  DataSource.BTC_CSV,
+  DataSource.ETH_CSV,
+  DataSource.SP500_CSV,
+];
 
 const results = await Promise.all(
   dataSources.map(async (source) => {
@@ -339,9 +342,9 @@ const results = await Promise.all(
     return {
       source,
       count: rows.length,
-      latestPrice: rows[rows.length - 1]?.c || 0
+      latestPrice: rows[rows.length - 1]?.c || 0,
     };
-  })
+  }),
 );
 
 console.log("Batch processing results:", results);
@@ -376,15 +379,21 @@ This will demonstrate all parsing strategies with real data.
 
 ### Fetching Functions
 
-- `fetchCsvAsText(source: DataSource): Promise<string>` - Fetch CSV as complete string
-- `fetchCsvAsStream(source: DataSource): Promise<ReadableStream<Uint8Array>>` - Fetch CSV as stream
+- `fetchCsvAsText(source: DataSource): Promise<string>` - Fetch CSV as complete
+  string
+- `fetchCsvAsStream(source: DataSource): Promise<ReadableStream<Uint8Array>>` -
+  Fetch CSV as stream
 
 ### Parsing Functions
 
-- `parseWithSimpleSplit(csvContent: string, skipHeader?: boolean): Row[]` - Simple line-by-line parsing
-- `parseFullStringWithStateMachine(csvContent: string, onSkipError?: SkipErrorCallback): Row[]` - State machine parsing with error handling
-- `parseStreamWithStateMachine(stream: ReadableStream<Uint8Array>, onRow: RowCallback, onSkipError?: SkipErrorCallback): Promise<number>` - Stream parsing with state machine
-- `parseStreamOptimizedOhlcv(stream: ReadableStream<Uint8Array>, onRow: RowCallback, skipHeader?: boolean, onSkipError?: SkipErrorCallback): Promise<number>` - Optimized stream parsing
+- `parseWithSimpleSplit(csvContent: string, skipHeader?: boolean): Row[]` -
+  Simple line-by-line parsing
+- `parseFullStringWithStateMachine(csvContent: string, onSkipError?: SkipErrorCallback): Row[]` -
+  State machine parsing with error handling
+- `parseStreamWithStateMachine(stream: ReadableStream<Uint8Array>, onRow: RowCallback, onSkipError?: SkipErrorCallback): Promise<number>` -
+  Stream parsing with state machine
+- `parseStreamOptimizedOhlcv(stream: ReadableStream<Uint8Array>, onRow: RowCallback, skipHeader?: boolean, onSkipError?: SkipErrorCallback): Promise<number>` -
+  Optimized stream parsing
 
 ### Type Definitions
 
@@ -408,4 +417,4 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-Built with ❤️ for the Deno community 
+Built with ❤️ for the Deno community

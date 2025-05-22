@@ -69,25 +69,25 @@ function parseOhlcvLineOptimizedInternal(line: string): Row | null {
 
 /**
  * High-performance streaming parser optimized specifically for OHLCV data.
- * 
+ *
  * This is the fastest parser in the library, using manual comma detection
  * and optimized memory allocation. It processes CSV streams with minimal
  * memory overhead and maximum throughput, making it ideal for large datasets
  * or performance-critical applications.
- * 
+ *
  * @param stream - ReadableStream of CSV data as Uint8Array chunks
  * @param onRow - Callback function called for each successfully parsed row
  * @param skipHeader - Whether to skip the first line (header row). Defaults to true
  * @param onSkipLine - Optional callback for handling parsing errors
  * @returns Promise resolving to the total number of rows processed
- * 
+ *
  * @example
  * ```typescript
  * import { fetchCsvAsStream, parseStreamOptimizedOhlcv, DataSource } from "@mso/ohlcv";
- * 
+ *
  * const stream = await fetchCsvAsStream(DataSource.SP500_CSV);
  * const rows: Row[] = [];
- * 
+ *
  * const totalRows = await parseStreamOptimizedOhlcv(
  *   stream,
  *   (row) => {
@@ -98,7 +98,7 @@ function parseOhlcvLineOptimizedInternal(line: string): Row | null {
  *     console.warn(`Skipped line ${lineNumber}: ${error.message}`);
  *   }
  * );
- * 
+ *
  * console.log(`Processed ${totalRows} rows, collected ${rows.length}`);
  * ```
  */

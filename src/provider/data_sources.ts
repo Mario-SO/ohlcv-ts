@@ -2,18 +2,18 @@
 
 /**
  * Pre-configured data sources for fetching OHLCV financial data.
- * 
+ *
  * These URLs point to CSV files containing historical financial data
  * in the standard OHLCV format (Date, Open, High, Low, Close, Volume).
- * 
+ *
  * @example
  * ```typescript
  * import { DataSource, fetchCsvAsText } from "@mso/ohlcv";
- * 
+ *
  * // Fetch Bitcoin historical data
  * const btcData = await fetchCsvAsText(DataSource.BTC_CSV);
- * 
- * // Fetch S&P 500 historical data  
+ *
+ * // Fetch S&P 500 historical data
  * const sp500Data = await fetchCsvAsText(DataSource.SP500_CSV);
  * ```
  */
