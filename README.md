@@ -14,20 +14,40 @@ A high-performance TypeScript library for fetching and parsing OHLCV (Open, High
 
 ## 📦 Installation
 
+### Add Package
+
+```bash
+deno add jsr:@mso/ohlcv
+```
+
+### Import symbol
+
+```typescript
+import * as ohlcv from "@mso/ohlcv";
+```
+
+### Or import directly with a JSR specifier
+
+```typescript
+import * as ohlcv from "jsr:@mso/ohlcv";
+```
+
+### Import specific functions
+
 ```typescript
 import { 
   DataSource, 
   fetchCsvAsText, 
   parseWithSimpleSplit 
-} from "https://deno.land/x/ohlcv@0.0.2/mod.ts";
+} from "@mso/ohlcv";
 ```
 
-Or import specific modules:
+### Import specific modules
 
 ```typescript
-import { fetchCsvAsStream } from "https://deno.land/x/ohlcv@0.0.2/provider";
-import { parseStreamOptimizedOhlcv } from "https://deno.land/x/ohlcv@0.0.2/parser";
-import type { Row } from "https://deno.land/x/ohlcv@0.0.2/types";
+import { fetchCsvAsStream } from "@mso/ohlcv/provider";
+import { parseStreamOptimizedOhlcv } from "@mso/ohlcv/parser";
+import type { Row } from "@mso/ohlcv/types";
 ```
 
 ## 🏃 Quick Start
@@ -37,7 +57,7 @@ import {
   DataSource, 
   fetchCsvAsText, 
   parseWithSimpleSplit 
-} from "https://deno.land/x/ohlcv@0.0.2/mod.ts";
+} from "@mso/ohlcv";
 
 // Fetch and parse Bitcoin data
 const csvData = await fetchCsvAsText(DataSource.BTC_CSV);
@@ -83,7 +103,7 @@ enum DataSource {
 Best for: Small to medium datasets, simple use cases
 
 ```typescript
-import { parseWithSimpleSplit } from "https://deno.land/x/ohlcv@0.0.2/mod.ts";
+import { parseWithSimpleSplit } from "@mso/ohlcv";
 
 const rows = parseWithSimpleSplit(csvData, true); // skipHeader = true
 ```
@@ -93,7 +113,7 @@ const rows = parseWithSimpleSplit(csvData, true); // skipHeader = true
 Best for: Better error handling and validation
 
 ```typescript
-import { parseFullStringWithStateMachine } from "https://deno.land/x/ohlcv@0.0.2/mod.ts";
+import { parseFullStringWithStateMachine } from "@mso/ohlcv";
 
 const onSkipError = (error: Error, lineNumber: number, lineContent: string) => {
   console.warn(`Skipped line ${lineNumber}: ${error.message}`);
@@ -110,7 +130,7 @@ Best for: Large datasets, memory efficiency
 import { 
   fetchCsvAsStream, 
   parseStreamWithStateMachine 
-} from "https://deno.land/x/ohlcv@0.0.2/mod.ts";
+} from "@mso/ohlcv";
 
 const stream = await fetchCsvAsStream(DataSource.BTC_CSV);
 let processedRows = 0;
@@ -138,7 +158,7 @@ Best for: Maximum performance with large datasets
 import { 
   fetchCsvAsStream, 
   parseStreamOptimizedOhlcv 
-} from "https://deno.land/x/ohlcv@0.0.2/mod.ts";
+} from "@mso/ohlcv";
 
 const stream = await fetchCsvAsStream(DataSource.SP500_CSV);
 const rows: Row[] = [];
@@ -160,7 +180,7 @@ const totalRows = await parseStreamOptimizedOhlcv(
 ### Date Conversion
 
 ```typescript
-import { yyyymmddToUnix } from "https://deno.land/x/ohlcv@0.0.2/utils";
+import { yyyymmddToUnix } from "@mso/ohlcv/utils";
 
 const timestamp = yyyymmddToUnix("2023-01-01"); // Returns Unix timestamp
 ```
@@ -176,7 +196,7 @@ import {
   InvalidTimestampError,
   FetchError,
   HttpError 
-} from "https://deno.land/x/ohlcv@0.0.2/errors";
+} from "@mso/ohlcv/errors";
 
 try {
   const data = await fetchCsvAsText(DataSource.BTC_CSV);
@@ -265,7 +285,7 @@ The library includes comprehensive benchmarks testing:
 import { 
   fetchCsvAsStream, 
   parseStreamOptimizedOhlcv 
-} from "https://deno.land/x/ohlcv@0.0.2/mod.ts";
+} from "@mso/ohlcv";
 
 // Process data as it streams in
 const stream = await fetchCsvAsStream(DataSource.BTC_CSV);
@@ -288,7 +308,7 @@ await parseStreamOptimizedOhlcv(
 ### Data Analysis
 
 ```typescript
-import { DataSource, fetchCsvAsText, parseWithSimpleSplit } from "https://deno.land/x/ohlcv@0.0.2/mod.ts";
+import { DataSource, fetchCsvAsText, parseWithSimpleSplit } from "@mso/ohlcv";
 
 const data = await fetchCsvAsText(DataSource.SP500_CSV);
 const rows = parseWithSimpleSplit(data);
@@ -308,7 +328,7 @@ console.log(`20-day moving average: ${ma20[ma20.length - 1]}`);
 ### Batch Processing
 
 ```typescript
-import { DataSource } from "https://deno.land/x/ohlcv@0.0.2/mod.ts";
+import { DataSource, fetchCsvAsText, parseWithSimpleSplit } from "@mso/ohlcv";
 
 const dataSources = [DataSource.BTC_CSV, DataSource.ETH_CSV, DataSource.SP500_CSV];
 
@@ -347,7 +367,7 @@ deno run --allow-net --allow-read your_script.ts
 Run the built-in demo:
 
 ```bash
-deno run --allow-net https://deno.land/x/ohlcv@0.0.2/mod.ts
+deno run --allow-net jsr:@mso/ohlcv
 ```
 
 This will demonstrate all parsing strategies with real data.
