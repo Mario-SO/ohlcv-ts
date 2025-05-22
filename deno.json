@@ -1,0 +1,16 @@
+{
+  "name": "@mso/ohlcv",
+  "version": "0.0.2",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./provider": "./src/provider/index.ts",
+    "./parser": "./src/parser/index.ts",
+    "./types": "./src/core/row.ts",
+    "./errors": "./src/core/errors.ts",
+    "./utils": "./src/utils/index.ts"
+  },
+  "compilerOptions": {
+    "lib": ["deno.ns", "dom"]
+  }
+}
