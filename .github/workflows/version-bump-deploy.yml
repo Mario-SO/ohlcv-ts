@@ -1,19 +1,18 @@
-name: Version Bump and Deploy
+name: Version Bump and Publish
 
 on:
   push:
     branches: [main]
 
 jobs:
-  version-bump-and-deploy:
-    name: Version Bump and Deploy
+  version-bump-and-publish:
+    name: Version Bump and Publish to JSR
     runs-on: ubuntu-latest
     if: contains(github.event.head_commit.message, 'bump(') && (contains(github.event.head_commit.message, 'bump(patch)') || contains(github.event.head_commit.message, 'bump(minor)') || contains(github.event.head_commit.message, 'bump(major)'))
 
     permissions:
-      id-token: write # Needed for auth with Deno Deploy
-      contents: write # Needed to clone the repository and push changes
-      pull-requests: read
+      contents: write # Needed to push version commits and tags
+      id-token: write # Needed for JSR publishing
 
     steps:
       - name: Clone repository
@@ -101,6 +100,24 @@ jobs:
           fi
         continue-on-error: true
 
+      - name: Validate package configuration
+        run: |
+          echo "Validating deno.json configuration for JSR..."
+          deno eval "
+            const config = JSON.parse(Deno.readTextFileSync('deno.json'));
+            console.log('Package name:', config.name);
+            console.log('Version:', config.version);
+            console.log('Exports:', Object.keys(config.exports || {}));
+            if (!config.name || !config.version || !config.exports) {
+              throw new Error('Invalid package configuration for JSR publishing');
+            }
+          "
+
+      - name: Publish to JSR
+        run: |
+          echo "Publishing to JSR registry..."
+          deno publish
+
       - name: Commit version bump
         run: |
           git add deno.json
@@ -111,19 +128,6 @@ jobs:
           git tag -a "v${{ steps.version.outputs.new_version }}" -m "Release v${{ steps.version.outputs.new_version }}"
           git push origin main
           git push origin "v${{ steps.version.outputs.new_version }}"
-
-      - name: Build step (if needed)
-        run: |
-          # Add any build commands here if your project requires them
-          # For example: deno task build
-          echo "No build step required for this project"
-
-      - name: Upload to Deno Deploy
-        uses: denoland/deployctl@v1
-        with:
-          project: "ohlcv-ts"
-          entrypoint: "mod.ts"
-          root: "."
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
@@ -141,43 +145,23 @@ jobs:
             ### Changes
             ${{ github.event.head_commit.message }}
             
-            ### Deployment
-            - ✅ Deployed to Deno Deploy
-            - ✅ Published to JSR (if configured)
-            
-            ### Install
+            ### Installation
             ```bash
             deno add jsr:@mso/ohlcv@${{ steps.version.outputs.new_version }}
             ```
+            
+            ### Package Info
+            - 📦 Published to JSR: https://jsr.io/@mso/ohlcv
+            - 🏷️ Version: ${{ steps.version.outputs.new_version }}
+            - 📈 Benchmarks: [View Results](https://github.com/${{ github.repository }}/actions)
           draft: false
           prerelease: false
 
-  deploy-only:
-    name: Deploy Only (No Version Bump)
-    runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, 'bump(')"
-
-    permissions:
-      id-token: write # Needed for auth with Deno Deploy
-      contents: read # Needed to clone the repository
-
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v4
-
-      - name: Install Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
-
-      - name: Build step (if needed)
+      - name: Verify JSR publication
         run: |
-          # Add any build commands here if your project requires them
-          echo "No build step required for this project"
-
-      - name: Upload to Deno Deploy
-        uses: denoland/deployctl@v1
-        with:
-          project: "ohlcv-ts"
-          entrypoint: "mod.ts"
-          root: "." 
+          echo "✅ Version ${{ steps.version.outputs.new_version }} published successfully!"
+          echo "📦 Package: @mso/ohlcv@${{ steps.version.outputs.new_version }}"
+          echo "🔗 JSR URL: https://jsr.io/@mso/ohlcv"
+          echo ""
+          echo "Install with:"
+          echo "deno add jsr:@mso/ohlcv@${{ steps.version.outputs.new_version }}" 
