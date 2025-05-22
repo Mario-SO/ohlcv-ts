@@ -1,6 +1,6 @@
 {
   "name": "@mso/ohlcv",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "exports": {
     ".": "./mod.ts",
@@ -11,6 +11,9 @@
     "./utils": "./src/utils/index.ts"
   },
   "compilerOptions": {
-    "lib": ["deno.ns", "dom"]
+    "lib": [
+      "deno.ns",
+      "dom"
+    ]
   }
 }
