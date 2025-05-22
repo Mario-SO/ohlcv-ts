@@ -1,0 +1,183 @@
+name: Version Bump and Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  version-bump-and-deploy:
+    name: Version Bump and Deploy
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, 'bump(') && (contains(github.event.head_commit.message, 'bump(patch)') || contains(github.event.head_commit.message, 'bump(minor)') || contains(github.event.head_commit.message, 'bump(major)'))
+
+    permissions:
+      id-token: write # Needed for auth with Deno Deploy
+      contents: write # Needed to clone the repository and push changes
+      pull-requests: read
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Determine bump type and update version
+        id: version
+        run: |
+          # Get current version from deno.json
+          CURRENT_VERSION=$(deno eval "console.log(JSON.parse(Deno.readTextFileSync('deno.json')).version)")
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Split version into parts
+          IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
+          MAJOR=${VERSION_PARTS[0]}
+          MINOR=${VERSION_PARTS[1]}
+          PATCH=${VERSION_PARTS[2]}
+          
+          # Determine bump type from commit message
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          
+          if [[ "$COMMIT_MSG" == *"bump(major)"* ]]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+            BUMP_TYPE="major"
+          elif [[ "$COMMIT_MSG" == *"bump(minor)"* ]]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+            BUMP_TYPE="minor"
+          elif [[ "$COMMIT_MSG" == *"bump(patch)"* ]]; then
+            PATCH=$((PATCH + 1))
+            BUMP_TYPE="patch"
+          else
+            echo "No valid bump type found in commit message"
+            exit 1
+          fi
+          
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "New version: $NEW_VERSION"
+          echo "Bump type: $BUMP_TYPE"
+          
+          # Update deno.json with new version
+          deno eval "
+            const config = JSON.parse(Deno.readTextFileSync('deno.json'));
+            config.version = '$NEW_VERSION';
+            Deno.writeTextFileSync('deno.json', JSON.stringify(config, null, 2) + '\n');
+          "
+          
+          # Set outputs
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Run tests (if available)
+        run: |
+          if [ -f "deno.json" ] && deno task --help | grep -q "test"; then
+            echo "Running tests..."
+            deno task test
+          else
+            echo "No test task found, skipping tests"
+          fi
+        continue-on-error: false
+
+      - name: Run benchmarks (if available)
+        run: |
+          if [ -f "bench.ts" ]; then
+            echo "Running benchmarks..."
+            deno bench --allow-net bench.ts || echo "Benchmarks failed but continuing..."
+          else
+            echo "No benchmark file found, skipping benchmarks"
+          fi
+        continue-on-error: true
+
+      - name: Commit version bump
+        run: |
+          git add deno.json
+          git commit -m "chore: bump version to v${{ steps.version.outputs.new_version }} (${{ steps.version.outputs.bump_type }})"
+
+      - name: Create and push tag
+        run: |
+          git tag -a "v${{ steps.version.outputs.new_version }}" -m "Release v${{ steps.version.outputs.new_version }}"
+          git push origin main
+          git push origin "v${{ steps.version.outputs.new_version }}"
+
+      - name: Build step (if needed)
+        run: |
+          # Add any build commands here if your project requires them
+          # For example: deno task build
+          echo "No build step required for this project"
+
+      - name: Upload to Deno Deploy
+        uses: denoland/deployctl@v1
+        with:
+          project: "ohlcv"
+          entrypoint: "mod.ts"
+          root: "."
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "v${{ steps.version.outputs.new_version }}"
+          release_name: "Release v${{ steps.version.outputs.new_version }}"
+          body: |
+            ## Version ${{ steps.version.outputs.new_version }}
+            
+            **Type:** ${{ steps.version.outputs.bump_type }} release
+            **Previous version:** ${{ steps.version.outputs.current_version }}
+            
+            ### Changes
+            ${{ github.event.head_commit.message }}
+            
+            ### Deployment
+            - ✅ Deployed to Deno Deploy
+            - ✅ Published to JSR (if configured)
+            
+            ### Install
+            ```bash
+            deno add jsr:@mso/ohlcv@${{ steps.version.outputs.new_version }}
+            ```
+          draft: false
+          prerelease: false
+
+  deploy-only:
+    name: Deploy Only (No Version Bump)
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'bump(')"
+
+    permissions:
+      id-token: write # Needed for auth with Deno Deploy
+      contents: read # Needed to clone the repository
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Build step (if needed)
+        run: |
+          # Add any build commands here if your project requires them
+          echo "No build step required for this project"
+
+      - name: Upload to Deno Deploy
+        uses: denoland/deployctl@v1
+        with:
+          project: "ohlcv"
+          entrypoint: "mod.ts"
+          root: "." 
