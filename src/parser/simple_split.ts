@@ -88,6 +88,33 @@ function parseLineToRowSimple(line: string, lineNumber?: number): Row {
 
 /**
  * Parses CSV data from a string using a simple line-by-line split.
+ * 
+ * This is the simplest and most straightforward parsing method. It loads
+ * the entire CSV content into memory and processes it line by line using
+ * basic string splitting. Best for small to medium datasets.
+ * 
+ * @param csvContent - The complete CSV content as a string
+ * @param skipHeader - Whether to skip the first line (header row). Defaults to true
+ * @returns Array of parsed Row objects
+ * 
+ * @throws {InvalidFormatError} When a line has the wrong number of fields
+ * @throws {InvalidTimestampError} When the date field cannot be parsed
+ * @throws {InvalidOpenError} When the open price is not a valid number
+ * @throws {InvalidHighError} When the high price is not a valid number
+ * @throws {InvalidLowError} When the low price is not a valid number
+ * @throws {InvalidCloseError} When the close price is not a valid number
+ * @throws {InvalidVolumeError} When the volume is not a valid number
+ * 
+ * @example
+ * ```typescript
+ * import { fetchCsvAsText, parseWithSimpleSplit, DataSource } from "@mso/ohlcv";
+ * 
+ * const csvData = await fetchCsvAsText(DataSource.BTC_CSV);
+ * const rows = parseWithSimpleSplit(csvData);
+ * 
+ * console.log(`Parsed ${rows.length} rows`);
+ * console.log("First row:", rows[0]);
+ * ```
  */
 export function parseWithSimpleSplit(
   csvContent: string,
